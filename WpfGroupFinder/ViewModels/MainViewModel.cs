@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ReactiveUI;
 
 namespace WpfGroupFinder.ViewModels
 {
-	public class MainViewModel
+	public class MainViewModel : ReactiveObject
 	{
+		private readonly IMessageBus _messageBus;
+
+		public MainViewModel(IMessageBus messageBus)
+		{
+			_messageBus = messageBus;
+		}
 	}
 }

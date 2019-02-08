@@ -17,6 +17,7 @@ namespace WpfGroupFinder
 
 			var container = containerBuilder.Build();
 			var app = new App();
+			app.InitializeComponent();
 			var mainWindow = container.Resolve<MainWindow>();
 			app.Run(mainWindow);
 		}
