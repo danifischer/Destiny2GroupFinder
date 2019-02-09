@@ -106,6 +106,8 @@
     <Compile Include="Helper\FormatFromWeb.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Logic\GroupParser.cs" />
+    <Compile Include="Logic\FileHandler.cs" />
+    <Compile Include="Logic\IFileHandler.cs" />
     <Compile Include="Logic\IGroupParser.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="ViewModels\GroupViewModel.cs" />

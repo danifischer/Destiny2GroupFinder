@@ -5,19 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfGroupFinder"
 		xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+		xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         Title="WpfGroupFinder" Height="450" Width="800"
 		d:DataContext="{d:DesignData Type=ViewModel:MainViewModel, IsDesignTimeCreatable=False}">
 	<Grid>
 		<StackPanel Orientation="Vertical">
-			<Button Command="{Binding UpdateCommand}" Content="Update"></Button>
-		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False">
+			<StackPanel Orientation="Horizontal">
+				<Button Command="{Binding UpdateCommand}" Margin="5">
+					<StackPanel Orientation="Horizontal">
+						<iconPacks:PackIconMaterial Kind="Update" Width="16" Height="16" Margin="3"
+                                                    VerticalAlignment="Center" />
+						<TextBlock Text="Update" VerticalAlignment="Center" />
+					</StackPanel>
+				</Button>
+				<controls:ProgressRing IsLarge="False" Width="5" Height="5" IsActive="{Binding IsUpdatingGroups}" HorizontalAlignment="Right"/>
+			</StackPanel>
+
+			<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True">
 			<DataGrid.Columns>
 				<DataGridTextColumn Binding="{Binding Title}" Header="Title" />
 				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
 				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
+				<DataGridTextColumn Binding="{Binding Time}" Header="Time" />
 				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="FirstSeen" />
-			</DataGrid.Columns>
+					<DataGridTemplateColumn Header="Bungie">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Button Background="Transparent" 
+									Command="{Binding OpenBungieCommand}" >
+									<iconPacks:PackIconModern Kind="GroupAdd" Height="12" Foreground="White"/>
+								</Button>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+					<DataGridTemplateColumn Header="Raid Report">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Button Background="Transparent" 
+									Command="{Binding OpenRaidReportCommand}" >
+									<iconPacks:PackIconMaterial Kind="FileChart" Height="12" Foreground="White"/>
+								</Button>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+				</DataGrid.Columns>
 		</DataGrid>
 		</StackPanel>
 	</Grid>

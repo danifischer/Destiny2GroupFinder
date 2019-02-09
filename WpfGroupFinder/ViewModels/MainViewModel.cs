@@ -14,14 +14,18 @@ namespace WpfGroupFinder.ViewModels
 		private readonly IMessageBus _messageBus;
 		private bool _isUpdatingGroups;
 		private ObservableCollection<GroupViewModel> _groups;
+		private readonly IFileHandler _fileHandler;
 
-		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser)
+		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, IFileHandler fileHandler)
 		{
 			_messageBus = messageBus;
 			_groupParser = groupParser;
+			_fileHandler = fileHandler;
 
-			Groups = new ObservableCollection<GroupViewModel>();
-			UpdateCommand = new RelayCommand(_ => UpdateGroups());
+			var groups = _fileHandler.LoadGroups().Select(i => new GroupViewModel(i));
+			Groups = new ObservableCollection<GroupViewModel>(groups);
+
+			UpdateCommand = new RelayCommand(_ => UpdateGroups(), _ => !IsUpdatingGroups);
 			UpdateGroups();
 		}
 
@@ -51,14 +55,19 @@ namespace WpfGroupFinder.ViewModels
 					Groups = new ObservableCollection<GroupViewModel>(groups);
 				}).ConfigureAwait(false);
 
-				Parallel.ForEach(Groups.Where(k => k.Owner == ""), i =>
+				IsUpdatingGroups = false;
+
+				await Task.Run(() =>
 				{
-					var info = _groupParser.GetOwnerInfo(i.Link);
-					i.Owner = info.Item1;
-					i.OwnerId = info.Item2;
+					Parallel.ForEach(Groups.Where(k => k.Owner == ""), i =>
+					{
+						var info = _groupParser.GetOwnerInfo(i.Link);
+						i.Owner = info.Item1;
+						i.OwnerId = info.Item2;
+					});
 				});
 
-				IsUpdatingGroups = false;
+				await _fileHandler.SaveGroups(Groups.Select(i => i._model));
 			}
 			catch
 			{

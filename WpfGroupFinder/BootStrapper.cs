@@ -13,7 +13,8 @@ namespace WpfGroupFinder
 		{
 			var containerBuilder = new ContainerBuilder();
 			containerBuilder.RegisterType<MessageBus>().As<IMessageBus>().SingleInstance();
-			containerBuilder.RegisterType<GroupParser>().As<IGroupParser>().SingleInstance();
+			containerBuilder.RegisterType<GroupParser>().As<IGroupParser>();
+			containerBuilder.RegisterType<FileHandler>().As<IFileHandler>();
 			containerBuilder.RegisterType<MainWindow>();
 			containerBuilder.RegisterType<MainViewModel>();
 

@@ -1,6 +1,8 @@
 ﻿using ReactiveUI;
 using System;
 using System.Diagnostics;
+using System.Net;
+using WpfGroupFinder.Helper;
 using WpfGroupFinder.Models;
 
 namespace WpfGroupFinder.ViewModels
@@ -9,12 +11,35 @@ namespace WpfGroupFinder.ViewModels
 	{
 		internal Group _model;
 
+		public RelayCommand OpenBungieCommand { get; }
+		public RelayCommand OpenRaidReportCommand { get; }
+
 		public GroupViewModel(Group group)
 		{
 			_model = group;
+			OpenBungieCommand = new RelayCommand(_ => OpenGroup());
+			OpenRaidReportCommand = new RelayCommand(_ => OpenReport());
 		}
 
-		public DateTime FirstSeen => _model.FirstSeen;
+		private void OpenReport()
+		{
+			if (OwnerId == "") return;
+			var user = WebUtility.UrlEncode(OwnerId);
+			Process.Start($"https://raid.report/pc/{user}");
+		}
+
+		public string FirstSeen => GetFirstSeenTime();
+
+		private string GetFirstSeenTime()
+		{
+			var minutes = (int)(DateTime.Now - _model.FirstSeen).TotalMinutes;
+			if(minutes < 1)
+			{
+				return "now";
+			}
+
+			return minutes.ToString() + "m";
+		}
 
 		public string Link => _model.Link;
 
