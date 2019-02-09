@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using ReactiveUI;
 using System;
+using WpfGroupFinder.Logic;
 using WpfGroupFinder.ViewModels;
 
 namespace WpfGroupFinder
@@ -12,6 +13,7 @@ namespace WpfGroupFinder
 		{
 			var containerBuilder = new ContainerBuilder();
 			containerBuilder.RegisterType<MessageBus>().As<IMessageBus>().SingleInstance();
+			containerBuilder.RegisterType<GroupParser>().As<IGroupParser>().SingleInstance();
 			containerBuilder.RegisterType<MainWindow>();
 			containerBuilder.RegisterType<MainViewModel>();
 

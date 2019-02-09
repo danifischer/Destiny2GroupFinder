@@ -8,7 +8,17 @@
         mc:Ignorable="d"
         Title="WpfGroupFinder" Height="450" Width="800"
 		d:DataContext="{d:DesignData Type=ViewModel:MainViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        
-    </Grid>
+	<Grid>
+		<StackPanel Orientation="Vertical">
+			<Button Command="{Binding UpdateCommand}" Content="Update"></Button>
+		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False">
+			<DataGrid.Columns>
+				<DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
+				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
+				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="FirstSeen" />
+			</DataGrid.Columns>
+		</DataGrid>
+		</StackPanel>
+	</Grid>
 </controls:MetroWindow>
