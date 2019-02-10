@@ -11,9 +11,6 @@ namespace WpfGroupFinder.ViewModels
 	{
 		internal Group _model;
 
-		public RelayCommand OpenBungieCommand { get; }
-		public RelayCommand OpenRaidReportCommand { get; }
-
 		public GroupViewModel(Group group)
 		{
 			_model = group;
@@ -21,28 +18,11 @@ namespace WpfGroupFinder.ViewModels
 			OpenRaidReportCommand = new RelayCommand(_ => OpenReport());
 		}
 
-		private void OpenReport()
-		{
-			if (OwnerId == "") return;
-			var user = WebUtility.UrlEncode(OwnerId);
-			Process.Start($"https://raid.report/pc/{user}");
-		}
-
 		public string FirstSeen => GetFirstSeenTime();
-
-		private string GetFirstSeenTime()
-		{
-			var minutes = (int)(DateTime.Now - _model.FirstSeen).TotalMinutes;
-			if(minutes < 1)
-			{
-				return "now";
-			}
-
-			return minutes.ToString() + "m";
-		}
-
+		public int FirstSeenSort => (int)(DateTime.Now - _model.FirstSeen).TotalMinutes;
 		public string Link => _model.Link;
-
+		public RelayCommand OpenBungieCommand { get; }
+		public RelayCommand OpenRaidReportCommand { get; }
 		public string Owner
 		{
 			get { return _model.Owner; }
@@ -88,6 +68,24 @@ namespace WpfGroupFinder.ViewModels
 		public void OpenGroup()
 		{
 			Process.Start(_model.Link);
+		}
+
+		private string GetFirstSeenTime()
+		{
+			var minutes = (int)(DateTime.Now - _model.FirstSeen).TotalMinutes;
+			if (minutes < 1)
+			{
+				return "now";
+			}
+
+			return minutes.ToString() + "m";
+		}
+
+		private void OpenReport()
+		{
+			if (OwnerId == "") return;
+			var user = WebUtility.UrlEncode(OwnerId);
+			Process.Start($"https://raid.report/pc/{user}");
 		}
 	}
 }

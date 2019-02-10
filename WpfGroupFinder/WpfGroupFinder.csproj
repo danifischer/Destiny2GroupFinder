@@ -110,6 +110,7 @@
     <Compile Include="Logic\IFileHandler.cs" />
     <Compile Include="Logic\IGroupParser.cs" />
     <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\Languages.cs" />
     <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">

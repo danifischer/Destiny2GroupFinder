@@ -1,10 +1,12 @@
 ﻿using ReactiveUI;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfGroupFinder.Helper;
 using WpfGroupFinder.Logic;
+using WpfGroupFinder.Models;
 
 namespace WpfGroupFinder.ViewModels
 {
@@ -16,15 +18,17 @@ namespace WpfGroupFinder.ViewModels
 		private ObservableCollection<GroupViewModel> _groups;
 		private readonly IFileHandler _fileHandler;
 
-		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, IFileHandler fileHandler)
+		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, IFileHandler fileHandler, IEnumerable<Languages> languages)
 		{
 			_messageBus = messageBus;
 			_groupParser = groupParser;
 			_fileHandler = fileHandler;
 
-			var groups = _fileHandler.LoadGroups().Select(i => new GroupViewModel(i));
-			Groups = new ObservableCollection<GroupViewModel>(groups);
+			Languages = new List<Languages>(languages);
+			SelectedLanguage = Languages.FirstOrDefault();
 
+			LoadGroupsFromFile();
+			
 			UpdateCommand = new RelayCommand(_ => UpdateGroups(), _ => !IsUpdatingGroups);
 			UpdateGroups();
 		}
@@ -43,6 +47,10 @@ namespace WpfGroupFinder.ViewModels
 
 		public ICommand UpdateCommand { get; }
 
+		public ICollection<Languages> Languages { get; }
+
+		public Languages SelectedLanguage { get; set; }
+
 		private async void UpdateGroups()
 		{
 			try
@@ -50,7 +58,8 @@ namespace WpfGroupFinder.ViewModels
 				IsUpdatingGroups = true;
 				await Task.Run(() =>
 				{
-					var groups = _groupParser.UpdateGroupList(Groups.Select(i => i._model).ToList(), "de")
+					LoadGroupsFromFile();
+					var groups = _groupParser.UpdateGroupList(Groups.Select(i => i._model).ToList(), SelectedLanguage.LanguageShort)
 										.Select(i => new GroupViewModel(i));
 					Groups = new ObservableCollection<GroupViewModel>(groups);
 				}).ConfigureAwait(false);
@@ -67,12 +76,18 @@ namespace WpfGroupFinder.ViewModels
 					});
 				});
 
-				await _fileHandler.SaveGroups(Groups.Select(i => i._model));
+				await _fileHandler.SaveGroups(Groups.Select(i => i._model), SelectedLanguage.LanguageShort);
 			}
 			catch
 			{
 				IsUpdatingGroups = false;
 			}
+		}
+
+		private void LoadGroupsFromFile()
+		{
+			var groups = _fileHandler.LoadGroups(SelectedLanguage.LanguageShort).Select(i => new GroupViewModel(i));
+			Groups = new ObservableCollection<GroupViewModel>(groups);
 		}
 	}
 }

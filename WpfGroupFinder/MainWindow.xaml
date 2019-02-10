@@ -10,8 +10,22 @@
         Title="WpfGroupFinder" Height="450" Width="800"
 		d:DataContext="{d:DesignData Type=ViewModel:MainViewModel, IsDesignTimeCreatable=False}">
 	<Grid>
-		<StackPanel Orientation="Vertical">
-			<StackPanel Orientation="Horizontal">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="45"></RowDefinition>
+			<RowDefinition Height="*"></RowDefinition>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row="0">
+				<ComboBox Width="150" Margin="5" VerticalContentAlignment="Center" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<iconPacks:PackIconOcticons Kind="Globe" Width="16" Height="16" Margin="3"
+                                                    VerticalAlignment="Center"/>
+								<TextBlock Text="{Binding LanguageLong}" VerticalAlignment="Center" />
+							</StackPanel>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
 				<Button Command="{Binding UpdateCommand}" Margin="5">
 					<StackPanel Orientation="Horizontal">
 						<iconPacks:PackIconMaterial Kind="Update" Width="16" Height="16" Margin="3"
@@ -19,38 +33,37 @@
 						<TextBlock Text="Update" VerticalAlignment="Center" />
 					</StackPanel>
 				</Button>
-				<controls:ProgressRing IsLarge="False" Width="5" Height="5" IsActive="{Binding IsUpdatingGroups}" HorizontalAlignment="Right"/>
+				<controls:ProgressRing IsLarge="False" Width="5" Height="5" IsActive="{Binding IsUpdatingGroups}" HorizontalAlignment="Right" />
 			</StackPanel>
 
-			<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True">
+		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Grid.Row="1">
 			<DataGrid.Columns>
 				<DataGridTextColumn Binding="{Binding Title}" Header="Title" />
 				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
 				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
 				<DataGridTextColumn Binding="{Binding Time}" Header="Time" />
-				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="FirstSeen" />
-					<DataGridTemplateColumn Header="Bungie">
-						<DataGridTemplateColumn.CellTemplate>
-							<DataTemplate>
-								<Button Background="Transparent" 
-									Command="{Binding OpenBungieCommand}" >
-									<iconPacks:PackIconModern Kind="GroupAdd" Height="12" Foreground="White"/>
-								</Button>
-							</DataTemplate>
-						</DataGridTemplateColumn.CellTemplate>
-					</DataGridTemplateColumn>
-					<DataGridTemplateColumn Header="Raid Report">
-						<DataGridTemplateColumn.CellTemplate>
-							<DataTemplate>
-								<Button Background="Transparent" 
-									Command="{Binding OpenRaidReportCommand}" >
-									<iconPacks:PackIconMaterial Kind="FileChart" Height="12" Foreground="White"/>
-								</Button>
-							</DataTemplate>
-						</DataGridTemplateColumn.CellTemplate>
-					</DataGridTemplateColumn>
-				</DataGrid.Columns>
+				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="FirstSeen" SortMemberPath="FirstSeenSort"/>
+				<DataGridTemplateColumn Header="Bungie">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Background="Transparent"
+									Command="{Binding OpenBungieCommand}">
+								<iconPacks:PackIconModern Kind="GroupAdd" Height="12" Foreground="White" />
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTemplateColumn Header="Raid Report">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Background="Transparent"
+									Command="{Binding OpenRaidReportCommand}">
+								<iconPacks:PackIconMaterial Kind="FileChart" Height="12" Foreground="White" />
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+			</DataGrid.Columns>
 		</DataGrid>
-		</StackPanel>
 	</Grid>
 </controls:MetroWindow>

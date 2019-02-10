@@ -6,7 +6,7 @@ namespace WpfGroupFinder.Logic
 {
 	public interface IFileHandler
 	{
-		IEnumerable<Group> LoadGroups();
-		Task SaveGroups(IEnumerable<Group> groups);
+		IEnumerable<Group> LoadGroups(string languageShort);
+		Task SaveGroups(IEnumerable<Group> groups, string languageShort);
 	}
 }

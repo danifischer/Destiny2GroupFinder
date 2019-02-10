@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using WpfGroupFinder.Logic;
+using WpfGroupFinder.Models;
 using WpfGroupFinder.ViewModels;
 
 namespace WpfGroupFinder
@@ -17,6 +18,9 @@ namespace WpfGroupFinder
 			containerBuilder.RegisterType<FileHandler>().As<IFileHandler>();
 			containerBuilder.RegisterType<MainWindow>();
 			containerBuilder.RegisterType<MainViewModel>();
+
+			containerBuilder.RegisterInstance(new Languages("Deutsch", "de"));
+			containerBuilder.RegisterInstance(new Languages("English", "en"));
 
 			var container = containerBuilder.Build();
 			var app = new App();
