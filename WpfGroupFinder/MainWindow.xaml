@@ -6,12 +6,17 @@
         xmlns:local="clr-namespace:WpfGroupFinder"
 		xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
 		xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+		xmlns:Flags="clr-namespace:FamFamFam.Flags.Wpf;assembly=FamFamFam.Flags.Wpf"
         mc:Ignorable="d"
-        Title="WpfGroupFinder" Height="450" Width="800"
+        Title="Group Finder" Height="450" Width="800"
 		d:DataContext="{d:DesignData Type=ViewModel:MainViewModel, IsDesignTimeCreatable=False}">
+	<controls:MetroWindow.Resources>
+		<Flags:CountryIdToFlagImageSourceConverter x:Key="CountryIdToFlagImageSourceConverter" />
+	</controls:MetroWindow.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="45"></RowDefinition>
+			<RowDefinition Height="3"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
 		</Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal" Grid.Row="0">
@@ -19,9 +24,9 @@
 					<ComboBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal">
-								<iconPacks:PackIconOcticons Kind="Globe" Width="16" Height="16" Margin="3"
-                                                    VerticalAlignment="Center"/>
-								<TextBlock Text="{Binding LanguageLong}" VerticalAlignment="Center" />
+							<Image Source="{Binding Path=LanguageCode, Converter={StaticResource CountryIdToFlagImageSourceConverter}}"
+								Stretch="None" Width="23" Height="18" RenderOptions.BitmapScalingMode="Linear" />
+							<TextBlock Text="{Binding LanguageLong}" VerticalAlignment="Center" />
 							</StackPanel>
 						</DataTemplate>
 					</ComboBox.ItemTemplate>
@@ -35,14 +40,16 @@
 				</Button>
 				<controls:ProgressRing IsLarge="False" Width="5" Height="5" IsActive="{Binding IsUpdatingGroups}" HorizontalAlignment="Right" />
 			</StackPanel>
-
-		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Grid.Row="1">
+		<controls:MetroProgressBar Minimum="0" Maximum="60" Value="{Binding UpdateTime}" Grid.Row="1" FlowDirection="LeftToRight"/>
+		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Grid.Row="2">
 			<DataGrid.Columns>
 				<DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+				<DataGridTextColumn Binding="{Binding Type.TypeShort}" Header="Type" />
 				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
 				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
-				<DataGridTextColumn Binding="{Binding Time}" Header="Time" />
-				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="FirstSeen" SortMemberPath="FirstSeenSort"/>
+				<DataGridTextColumn Binding="{Binding Time}" Header="Updated" />
+				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="Time" SortMemberPath="FirstSeenSort"/>
+				<DataGridTextColumn Binding="{Binding Clears}" Header="Clears" />
 				<DataGridTemplateColumn Header="Bungie">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
@@ -53,7 +60,7 @@
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTemplateColumn Header="Raid Report">
+				<DataGridTemplateColumn Header="Report">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<Button Background="Transparent"

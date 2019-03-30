@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using WpfGroupFinder.Models;
@@ -27,6 +28,23 @@ namespace WpfGroupFinder.Logic
 			return groups;
 		}
 
+		public IEnumerable<Activity> LoadHashInformation()
+		{
+			List<Activity> hashList = new List<Activity>();
+
+			if (!File.Exists(@"hashList.json"))
+			{
+				return new ObservableCollection<Activity>(hashList);
+			}
+			using (StreamReader file = File.OpenText(@"hashList.json"))
+			{
+				JsonSerializer serializer = new JsonSerializer();
+				hashList = (List<Activity>)serializer.Deserialize(file, typeof(List<Activity>));
+			}
+
+			return hashList;
+		}
+
 		public async Task SaveGroups(IEnumerable<Group> groups, string languageShort)
 		{
 			await Task.Run(() =>
@@ -38,7 +56,6 @@ namespace WpfGroupFinder.Logic
 				}
 			});
 		}
-
 		private string GetLangaugeSpecificFilename(string languageShort)
 		{
 			return Filename + "_" + languageShort + ".json";

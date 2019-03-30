@@ -17,12 +17,18 @@ namespace WpfGroupFinder.ViewModels
 		private bool _isUpdatingGroups;
 		private ObservableCollection<GroupViewModel> _groups;
 		private readonly IFileHandler _fileHandler;
+		private readonly IUpdateTimer _updateTimer;
+		private int _updateTime;
+		private readonly IRaidCategorizer _raidCategorizer;
 
-		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, IFileHandler fileHandler, IEnumerable<Languages> languages)
+		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, 
+			IFileHandler fileHandler, IEnumerable<Languages> languages, IUpdateTimer updateTimer, IRaidCategorizer raidCategorizer)
 		{
 			_messageBus = messageBus;
 			_groupParser = groupParser;
 			_fileHandler = fileHandler;
+			_updateTimer = updateTimer;
+			_raidCategorizer = raidCategorizer;
 
 			Languages = new List<Languages>(languages);
 			SelectedLanguage = Languages.FirstOrDefault();
@@ -31,6 +37,15 @@ namespace WpfGroupFinder.ViewModels
 			
 			UpdateCommand = new RelayCommand(_ => UpdateGroups(), _ => !IsUpdatingGroups);
 			UpdateGroups();
+
+			UpdateTime = 0;
+			_updateTimer.TimeoutAction = () => UpdateUpdateTime();
+			_updateTimer.StartTimer(1000);
+		}
+
+		~MainViewModel()
+		{
+			_updateTimer.StopTimer();
 		}
 
 		public ObservableCollection<GroupViewModel> Groups
@@ -45,6 +60,21 @@ namespace WpfGroupFinder.ViewModels
 			private set { _isUpdatingGroups = this.RaiseAndSetIfChanged(ref _isUpdatingGroups, value); }
 		}
 
+		public int UpdateTime
+		{
+			get { return _updateTime; }
+			set { _updateTime = this.RaiseAndSetIfChanged(ref _updateTime, value); }
+		}
+
+		private void UpdateUpdateTime()
+		{
+			UpdateTime++;
+			if(UpdateTime > 60)
+			{
+				UpdateGroups();
+			}
+		}
+
 		public ICommand UpdateCommand { get; }
 
 		public ICollection<Languages> Languages { get; }
@@ -56,12 +86,13 @@ namespace WpfGroupFinder.ViewModels
 			try
 			{
 				IsUpdatingGroups = true;
+				UpdateTime = 0;
 				await Task.Run(() =>
 				{
 					LoadGroupsFromFile();
 					var groups = _groupParser.UpdateGroupList(Groups.Select(i => i._model).ToList(), SelectedLanguage.LanguageShort)
 										.Select(i => new GroupViewModel(i));
-					Groups = new ObservableCollection<GroupViewModel>(groups);
+					Groups = new ObservableCollection<GroupViewModel>(groups.OrderBy(i => i.FirstSeenSort));
 				}).ConfigureAwait(false);
 
 				IsUpdatingGroups = false;
@@ -70,9 +101,13 @@ namespace WpfGroupFinder.ViewModels
 				{
 					Parallel.ForEach(Groups.Where(k => k.Owner == ""), i =>
 					{
+						i.Type = _raidCategorizer.Categorize(i.Title);
+
 						var info = _groupParser.GetOwnerInfo(i.Link);
 						i.Owner = info.Item1;
 						i.OwnerId = info.Item2;
+
+						i.Clears = new ReportParser(_fileHandler).GetClears(i.OwnerId, i.Type.TypeLong);
 					});
 				});
 

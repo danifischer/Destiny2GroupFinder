@@ -63,6 +63,26 @@ namespace WpfGroupFinder.ViewModels
 			}
 		}
 
+		public RaidType Type
+		{
+			get { return _model.Type; }
+			internal set
+			{
+				_model.Type = value;
+				this.RaisePropertyChanged();
+			}
+		}
+
+		public string Clears
+		{
+			get { return _model.Clears; }
+			internal set
+			{
+				_model.Clears = value;
+				this.RaisePropertyChanged();
+			}
+		}
+
 		public string Title => _model.Title;
 
 		public void OpenGroup()
@@ -76,6 +96,10 @@ namespace WpfGroupFinder.ViewModels
 			if (minutes < 1)
 			{
 				return "now";
+			}
+			if (minutes > 60)
+			{
+				return "> 1h";
 			}
 
 			return minutes.ToString() + "m";

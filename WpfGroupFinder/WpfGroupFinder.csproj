@@ -7,7 +7,7 @@
     <ProjectGuid>{5A679A64-E7E8-42E9-8A9E-58148C124DCF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>WpfGroupFinder</RootNamespace>
-    <AssemblyName>WpfGroupFinder</AssemblyName>
+    <AssemblyName>GroupFinder</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -37,6 +37,9 @@
   <PropertyGroup>
     <StartupObject>WpfGroupFinder.BootStrapper</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>search.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
@@ -46,6 +49,9 @@
     </Reference>
     <Reference Include="DynamicData, Version=6.7.1.2534, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicData.6.7.1.2534\lib\net46\DynamicData.dll</HintPath>
+    </Reference>
+    <Reference Include="FamFamFam.Flags.Wpf, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FamFamFam.Flags.Wpf.1.1.2\lib\net35\FamFamFam.Flags.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.8.14.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.8.14\lib\Net45\HtmlAgilityPack.dll</HintPath>
@@ -107,10 +113,17 @@
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Logic\GroupParser.cs" />
     <Compile Include="Logic\FileHandler.cs" />
-    <Compile Include="Logic\IFileHandler.cs" />
-    <Compile Include="Logic\IGroupParser.cs" />
+    <Compile Include="Logic\Interfaces\IFileHandler.cs" />
+    <Compile Include="Logic\Interfaces\IGroupParser.cs" />
+    <Compile Include="Logic\Interfaces\IRaidCategorizer.cs" />
+    <Compile Include="Logic\Interfaces\IUpdateTimer.cs" />
+    <Compile Include="Logic\RaidCategorizer.cs" />
+    <Compile Include="Logic\ReportParser.cs" />
+    <Compile Include="Logic\UpdateTimer.cs" />
     <Compile Include="Models\Group.cs" />
+    <Compile Include="Models\Activity.cs" />
     <Compile Include="Models\Languages.cs" />
+    <Compile Include="Models\RaidType.cs" />
     <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">
@@ -154,6 +167,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="search.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
