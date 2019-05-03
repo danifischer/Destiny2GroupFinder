@@ -9,7 +9,7 @@ The displayed information consists of:
 - Title:  
   The title of the group on the bungie site
 - Type:  
-  The raid which is searched for (I try to get this form the titel but typos or bossnames are not checked for)
+  The raid which is searched for (I try to get this form the title but typos or bossnames are not checked for)
 - Space:  
   The number of open slots in this group 
 - Owner:  
