@@ -11,7 +11,7 @@ namespace WpfGroupFinder.Helper
 
 			input = input.Replace("\r\n", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
 			byte[] bytes = Encoding.GetEncoding(1252).GetBytes(input);
-			return Encoding.UTF8.GetString(bytes);
+			return HttpUtility.HtmlDecode(Encoding.UTF8.GetString(bytes));
 		}
 	}
 }
