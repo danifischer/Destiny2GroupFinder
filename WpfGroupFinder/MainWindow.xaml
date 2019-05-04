@@ -43,7 +43,13 @@
 		<controls:MetroProgressBar Minimum="0" Maximum="60" Value="{Binding UpdateTime}" Grid.Row="1" FlowDirection="LeftToRight"/>
 		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Grid.Row="2">
 			<DataGrid.Columns>
-				<DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+				<DataGridTextColumn Binding="{Binding Title}" Header="Title">
+					<DataGridTextColumn.ElementStyle>
+						<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+							<Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+						</Style>
+					</DataGridTextColumn.ElementStyle>
+				</DataGridTextColumn>
 				<DataGridTextColumn Binding="{Binding Type.TypeShort}" Header="Type" />
 				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
 				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
