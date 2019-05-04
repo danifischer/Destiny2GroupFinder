@@ -23,6 +23,10 @@ namespace WpfGroupFinder
 
 			containerBuilder.RegisterInstance(new Languages("Deutsch", "de", "de"));
 			containerBuilder.RegisterInstance(new Languages("English", "en", "us"));
+			containerBuilder.RegisterInstance(new Languages("Français", "fr", "fr"));
+			containerBuilder.RegisterInstance(new Languages("Español", "es", "es"));
+			containerBuilder.RegisterInstance(new Languages("Italiano", "it", "it"));
+			containerBuilder.RegisterInstance(new Languages("Polski", "pl", "pl"));
 
 			var container = containerBuilder.Build();
 			var app = new App();
