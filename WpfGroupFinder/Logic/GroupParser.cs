@@ -33,7 +33,9 @@ namespace WpfGroupFinder.Logic
 				.SelectSingleNode("//li[contains(@class,'leader')]");
 			var membershipId = item.GetAttributeValue("data-membershipid", "");
 
-			var nameNode = item.ChildNodes.Single(i => i.HasClass("user-data")).ChildNodes.Single(j => j.HasClass("user-container"));
+			var nameNode = item.ChildNodes.Single(i => i.HasClass("user-data"))
+				.ChildNodes.Single(j => j.HasClass("user-container"))
+				.ChildNodes.Single(j => j.HasClass("display-name"));
 			var name = FormatFromWeb.Format(nameNode.InnerText);
 
 			return new Tuple<string, string>(name, membershipId);
@@ -41,7 +43,7 @@ namespace WpfGroupFinder.Logic
 
 		public IEnumerable<Group> UpdateGroupList(IList<Group> currentGroups, string language)
 		{
-			var pageUrl = $@"https://www.bungie.net/en/ClanV2/FireteamSearch?platform=3&activityType=1&lang={language}&groupid=&";
+			var pageUrl = $@"https://www.bungie.net/en/ClanV2/FireteamSearch?platform=4&activityType=1&lang={language}&groupid=&";
 
 			var doc = new HtmlAgilityPack.HtmlDocument();
 			HtmlAgilityPack.HtmlNode.ElementsFlags["br"] = HtmlAgilityPack.HtmlElementFlag.Empty;
