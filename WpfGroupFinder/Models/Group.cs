@@ -12,6 +12,7 @@ namespace WpfGroupFinder.Models
 		public string Time { get; set; }
 		public string Owner { get; set; }
 		public string OwnerId { get; set; }
+		public string OwnerSteamId { get; set; }
 		public RaidType Type { get; set; }
 		public string Clears { get; set; }
 	}

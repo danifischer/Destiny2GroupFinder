@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WpfGroupFinder.Models;
 
@@ -56,6 +57,36 @@ namespace WpfGroupFinder.Logic
 				}
 			});
 		}
+
+		public async Task SaveRaids(IEnumerable<RaidType> raidTypes)
+		{
+			await Task.Run(() =>
+			{
+				using (StreamWriter file = File.CreateText(@"raidTypes.json"))
+				{
+					JsonSerializer serializer = new JsonSerializer();
+					serializer.Serialize(file, raidTypes);
+				}
+			});
+		}
+
+		public IEnumerable<RaidType> LoadRaids()
+		{
+			List<RaidType> hashList = new List<RaidType>();
+
+			if (!File.Exists(@"raidTypes.json"))
+			{
+				return Enumerable.Empty<RaidType>();
+			}
+			using (StreamReader file = File.OpenText(@"raidTypes.json"))
+			{
+				JsonSerializer serializer = new JsonSerializer();
+				hashList = (List<RaidType>)serializer.Deserialize(file, typeof(List<RaidType>));
+			}
+
+			return hashList;
+		}
+
 		private string GetLangaugeSpecificFilename(string languageShort)
 		{
 			return Filename + "_" + languageShort + ".json";

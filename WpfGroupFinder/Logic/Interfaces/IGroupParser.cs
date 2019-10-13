@@ -6,7 +6,7 @@ namespace WpfGroupFinder.Logic
 {
 	public interface IGroupParser
 	{
-		Tuple<string, string> GetOwnerInfo(string pageUrl);
+		Tuple<string, string, string> GetOwnerInfo(string pageUrl);
 		IEnumerable<Group> UpdateGroupList(IList<Group> currentGroups, string language);
 	}
 }

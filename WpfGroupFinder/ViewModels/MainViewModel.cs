@@ -96,6 +96,7 @@ namespace WpfGroupFinder.ViewModels
 				}).ConfigureAwait(false);
 
 				IsUpdatingGroups = false;
+				var parser = new ReportParser(_fileHandler);
 
 				await Task.Run(() =>
 				{
@@ -106,8 +107,9 @@ namespace WpfGroupFinder.ViewModels
 						var info = _groupParser.GetOwnerInfo(i.Link);
 						i.Owner = info.Item1;
 						i.OwnerId = info.Item2;
+						i.OwnerSteamId = info.Item3;
 
-						i.Clears = new ReportParser(_fileHandler).GetClears(i.OwnerId, i.Type.TypeLong);
+						i.Clears = parser.GetClears(i.OwnerId, i.Type.BungieName);
 					});
 				});
 

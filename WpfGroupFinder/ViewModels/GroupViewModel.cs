@@ -43,6 +43,16 @@ namespace WpfGroupFinder.ViewModels
 			}
 		}
 
+		public string OwnerSteamId
+		{
+			get { return _model.OwnerSteamId; }
+			internal set
+			{
+				_model.OwnerSteamId = value;
+				this.RaisePropertyChanged();
+			}
+		}
+
 		public string Space
 		{
 			get { return _model.Space; }

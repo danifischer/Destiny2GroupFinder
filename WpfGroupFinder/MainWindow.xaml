@@ -50,12 +50,13 @@
 						</Style>
 					</DataGridTextColumn.ElementStyle>
 				</DataGridTextColumn>
-				<DataGridTextColumn Binding="{Binding Type.TypeShort}" Header="Type" />
+				<DataGridTextColumn Binding="{Binding Type.ShortName}" Header="Type" />
 				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
 				<DataGridTextColumn Binding="{Binding Owner}" Header="Owner" />
 				<DataGridTextColumn Binding="{Binding Time}" Header="Updated" />
 				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="Time" SortMemberPath="FirstSeenSort"/>
 				<DataGridTextColumn Binding="{Binding Clears}" Header="Clears" />
+				<DataGridTextColumn Binding="{Binding OwnerSteamId}" Header="Steam ID" />
 				<DataGridTemplateColumn Header="Bungie">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>

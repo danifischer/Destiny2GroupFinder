@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WpfGroupFinder.Models
 {
 	public class RaidType
 	{
-		public string TypeShort { get; set; }
-		public string TypeLong { get; set; }
+		public string ShortName { get; set; }
+		public string BungieName { get; set; }
+		public List<string> Tags { get; set; }
 	}
 }

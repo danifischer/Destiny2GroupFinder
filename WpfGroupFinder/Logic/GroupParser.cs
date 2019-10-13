@@ -11,7 +11,7 @@ namespace WpfGroupFinder.Logic
 {
 	public class GroupParser : IGroupParser
 	{
-		public Tuple<string, string> GetOwnerInfo(string pageUrl)
+		public Tuple<string, string, string> GetOwnerInfo(string pageUrl)
 		{
 			var doc = new HtmlAgilityPack.HtmlDocument();
 			HtmlAgilityPack.HtmlNode.ElementsFlags["br"] = HtmlAgilityPack.HtmlElementFlag.Empty;
@@ -26,7 +26,7 @@ namespace WpfGroupFinder.Logic
 			}
 			catch
 			{
-				return new Tuple<string, string>("", null);
+				return new Tuple<string, string, string>("", null, null);
 			}
 
 			var item = doc.DocumentNode.SelectNodes("//li[contains(@class,'user-fireteam')]").First().ParentNode
@@ -34,11 +34,12 @@ namespace WpfGroupFinder.Logic
 			var membershipId = item.GetAttributeValue("data-membershipid", "");
 
 			var nameNode = item.ChildNodes.Single(i => i.HasClass("user-data"))
-				.ChildNodes.Single(j => j.HasClass("user-container"))
-				.ChildNodes.Single(j => j.HasClass("display-name"));
-			var name = FormatFromWeb.Format(nameNode.InnerText);
+				.ChildNodes.Single(j => j.HasClass("user-container"));
+				
+			var name = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.HasClass("display-name")).InnerText);
+			var steamId = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.Name == "span").InnerText.Replace("ID: ", ""));
 
-			return new Tuple<string, string>(name, membershipId);
+			return new Tuple<string, string, string>(name, membershipId, steamId);
 		}
 
 		public IEnumerable<Group> UpdateGroupList(IList<Group> currentGroups, string language)
@@ -108,6 +109,7 @@ namespace WpfGroupFinder.Logic
 						Title = title,
 						Owner = "",//owner.Item1,
 						OwnerId = "",//owner.Item2,
+						OwnerSteamId = "",
 						Space = space.ToString(),
 						Time = time,
 						Link = url

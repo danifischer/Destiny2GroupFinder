@@ -54,10 +54,10 @@ namespace WpfGroupFinder.Logic
 
 				return clears + " (" + totalClears + ")";
 			}
-			catch 
+			catch
 			{
 				return "n/a";
-			}			
+			}	
 		}
 	}
 }
