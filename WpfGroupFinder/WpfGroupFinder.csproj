@@ -109,6 +109,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helper\FireteamViewModelFactory.cs" />
     <Compile Include="Helper\FormatFromWeb.cs" />
     <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Logic\GroupParser.cs" />
@@ -122,11 +123,16 @@
     <Compile Include="Logic\UpdateTimer.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\Activity.cs" />
+    <Compile Include="Models\Guardian.cs" />
     <Compile Include="Models\Languages.cs" />
     <Compile Include="Models\RaidType.cs" />
+    <Compile Include="ViewModels\FireteamDetailViewModel.cs" />
     <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Views\FireteamDetailView.xaml.cs">
+      <DependentUpon>FireteamDetailView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -135,10 +141,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BootStrapper.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\FireteamDetailView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

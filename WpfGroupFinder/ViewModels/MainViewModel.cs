@@ -12,30 +12,34 @@ namespace WpfGroupFinder.ViewModels
 {
 	public class MainViewModel : ReactiveObject
 	{
+		private readonly IFileHandler _fileHandler;
+		private readonly FireteamViewModelFactory _fireteamViewModelFactory;
 		private readonly IGroupParser _groupParser;
 		private readonly IMessageBus _messageBus;
-		private bool _isUpdatingGroups;
-		private ObservableCollection<GroupViewModel> _groups;
-		private readonly IFileHandler _fileHandler;
-		private readonly IUpdateTimer _updateTimer;
-		private int _updateTime;
 		private readonly IRaidCategorizer _raidCategorizer;
+		private readonly IUpdateTimer _updateTimer;
+		private ObservableCollection<GroupViewModel> _groups;
+		private bool _isUpdatingGroups;
+		private int _updateTime;
 
-		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser, 
-			IFileHandler fileHandler, IEnumerable<Languages> languages, IUpdateTimer updateTimer, IRaidCategorizer raidCategorizer)
+		public MainViewModel(IMessageBus messageBus, IGroupParser groupParser,
+			IFileHandler fileHandler, IEnumerable<Languages> languages, IUpdateTimer updateTimer,
+			IRaidCategorizer raidCategorizer, FireteamViewModelFactory fireteamViewModelFactory)
 		{
 			_messageBus = messageBus;
 			_groupParser = groupParser;
 			_fileHandler = fileHandler;
 			_updateTimer = updateTimer;
 			_raidCategorizer = raidCategorizer;
+			_fireteamViewModelFactory = fireteamViewModelFactory;
 
 			Languages = new List<Languages>(languages);
 			SelectedLanguage = Languages.FirstOrDefault();
 
 			LoadGroupsFromFile();
-			
+
 			UpdateCommand = new RelayCommand(_ => UpdateGroups(), _ => !IsUpdatingGroups);
+			OpenCommand = new RelayCommand(OpenDetail, _ => !IsUpdatingGroups);
 			UpdateGroups();
 
 			UpdateTime = 0;
@@ -60,26 +64,34 @@ namespace WpfGroupFinder.ViewModels
 			private set { _isUpdatingGroups = this.RaiseAndSetIfChanged(ref _isUpdatingGroups, value); }
 		}
 
+		public ICollection<Languages> Languages { get; }
+
+		public ICommand OpenCommand { get; }
+
+		public Languages SelectedLanguage { get; set; }
+
+		public ICommand UpdateCommand { get; }
+
 		public int UpdateTime
 		{
 			get { return _updateTime; }
 			set { _updateTime = this.RaiseAndSetIfChanged(ref _updateTime, value); }
 		}
 
-		private void UpdateUpdateTime()
+		private void LoadGroupsFromFile()
 		{
-			UpdateTime++;
-			if(UpdateTime > 60)
-			{
-				UpdateGroups();
-			}
+			var groups = _fileHandler.LoadGroups(SelectedLanguage.LanguageShort).Select(i => new GroupViewModel(i, _fireteamViewModelFactory));
+			Groups = new ObservableCollection<GroupViewModel>(groups);
 		}
 
-		public ICommand UpdateCommand { get; }
-
-		public ICollection<Languages> Languages { get; }
-
-		public Languages SelectedLanguage { get; set; }
+		private void OpenDetail(object obj)
+		{
+			var groupViewModel = obj as GroupViewModel;
+			if (groupViewModel != null)
+			{
+				groupViewModel.ShowDetailCommand.Execute(null);
+			}
+		}
 
 		private async void UpdateGroups()
 		{
@@ -91,7 +103,7 @@ namespace WpfGroupFinder.ViewModels
 				{
 					LoadGroupsFromFile();
 					var groups = _groupParser.UpdateGroupList(Groups.Select(i => i._model).ToList(), SelectedLanguage.LanguageShort)
-										.Select(i => new GroupViewModel(i));
+										.Select(i => new GroupViewModel(i, _fireteamViewModelFactory));
 					Groups = new ObservableCollection<GroupViewModel>(groups.OrderBy(i => i.FirstSeenSort));
 				}).ConfigureAwait(false);
 
@@ -100,16 +112,24 @@ namespace WpfGroupFinder.ViewModels
 
 				await Task.Run(() =>
 				{
-					Parallel.ForEach(Groups.Where(k => k.Owner == ""), i =>
+					Parallel.ForEach(Groups.Where(k => k.Owner == null || k.Updated), i =>
 					{
 						i.Type = _raidCategorizer.Categorize(i.Title);
+						i.Fireteam = _groupParser.GetFireteam(i.Link);
+						foreach (var guardian in i.Fireteam)
+						{
+							parser.SetClears(guardian, i.Type.BungieName);
+						}
 
-						var info = _groupParser.GetOwnerInfo(i.Link);
-						i.Owner = info.Item1;
-						i.OwnerId = info.Item2;
-						i.OwnerSteamId = info.Item3;
-
-						i.Clears = parser.GetClears(i.OwnerId, i.Type.BungieName);
+						if (i.Fireteam.All(j => j.ClearsTotal == null))
+						{
+							i.Clears = "none";
+						}
+						else
+						{
+							i.Clears = string.Format("{0:0} ({1:0})", i.Fireteam.Average(j => j.ClearsActivity), i.Fireteam.Average(j => j.ClearsTotal));
+						}
+						i.Updated = false;
 					});
 				});
 
@@ -121,10 +141,13 @@ namespace WpfGroupFinder.ViewModels
 			}
 		}
 
-		private void LoadGroupsFromFile()
+		private void UpdateUpdateTime()
 		{
-			var groups = _fileHandler.LoadGroups(SelectedLanguage.LanguageShort).Select(i => new GroupViewModel(i));
-			Groups = new ObservableCollection<GroupViewModel>(groups);
+			UpdateTime++;
+			if (UpdateTime > 60)
+			{
+				UpdateGroups();
+			}
 		}
 	}
 }

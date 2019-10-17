@@ -1,0 +1,97 @@
+﻿<controls:MetroWindow x:Class="WpfGroupFinder.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfGroupFinder"
+		xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+		xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+		xmlns:Flags="clr-namespace:FamFamFam.Flags.Wpf;assembly=FamFamFam.Flags.Wpf"
+        mc:Ignorable="d"
+        Title="Group Finder" Height="600" Width="1000"
+		d:DataContext="{d:DesignData Type=ViewModel:MainViewModel, IsDesignTimeCreatable=False}">
+	<controls:MetroWindow.Resources>
+		<Flags:CountryIdToFlagImageSourceConverter x:Key="CountryIdToFlagImageSourceConverter" />
+	</controls:MetroWindow.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="45"></RowDefinition>
+			<RowDefinition Height="3"></RowDefinition>
+			<RowDefinition Height="*"></RowDefinition>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row="0">
+			<ComboBox Width="150" Margin="5" VerticalContentAlignment="Center" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}">
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal">
+							<Image Source="{Binding Path=LanguageCode, Converter={StaticResource CountryIdToFlagImageSourceConverter}}"
+								Stretch="None" Width="23" Height="18" RenderOptions.BitmapScalingMode="Linear" />
+							<TextBlock Text="{Binding LanguageLong}" VerticalAlignment="Center" />
+						</StackPanel>
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+			<Button Command="{Binding UpdateCommand}" Margin="5">
+				<StackPanel Orientation="Horizontal">
+					<iconPacks:PackIconMaterial Kind="Update" Width="16" Height="16" Margin="3"
+                                                    VerticalAlignment="Center" />
+					<TextBlock Text="Update" VerticalAlignment="Center" />
+				</StackPanel>
+			</Button>
+			<controls:ProgressRing IsLarge="False" Width="5" Height="5" IsActive="{Binding IsUpdatingGroups}" HorizontalAlignment="Right" />
+		</StackPanel>
+		<controls:MetroProgressBar Minimum="0" Maximum="60" Value="{Binding UpdateTime}" Grid.Row="1" FlowDirection="LeftToRight" />
+		<DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Grid.Row="2"
+				  x:Name="RaidGrid">
+			<DataGrid.InputBindings>
+				<MouseBinding MouseAction="LeftDoubleClick" Command="{Binding OpenCommand}"
+							  CommandParameter="{Binding ElementName=RaidGrid, Path=SelectedItem}" />
+			</DataGrid.InputBindings>
+			<DataGrid.Columns>
+				<DataGridTextColumn Binding="{Binding Title}" Header="Title">
+					<DataGridTextColumn.ElementStyle>
+						<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+							<Setter Property="TextTrimming" Value="CharacterEllipsis" />
+						</Style>
+					</DataGridTextColumn.ElementStyle>
+				</DataGridTextColumn>
+				<DataGridTextColumn Binding="{Binding Type.ShortName}" Header="Type" />
+				<DataGridTextColumn Binding="{Binding Space}" Header="Space" />
+				<DataGridTextColumn Binding="{Binding Owner.Name}" Header="Owner" />
+				<DataGridTextColumn Binding="{Binding Time}" Header="Updated" />
+				<DataGridTextColumn Binding="{Binding FirstSeen}" Header="Time" SortMemberPath="FirstSeenSort" />
+				<DataGridTextColumn Binding="{Binding Clears}" Header="Clears" />
+				<DataGridTemplateColumn Header="Bungie">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Background="Transparent"
+									Command="{Binding OpenBungieCommand}">
+								<iconPacks:PackIconModern Kind="GroupAdd" Height="12" Foreground="White" />
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTemplateColumn Header="Report">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Background="Transparent"
+									Command="{Binding OpenRaidReportCommand}">
+								<iconPacks:PackIconMaterial Kind="FileChart" Height="12" Foreground="White" />
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTemplateColumn Header="Detail">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Background="Transparent"
+									Command="{Binding ShowDetailCommand}">
+								<iconPacks:PackIconMaterial Kind="Magnify" Height="12" Foreground="White" />
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+			</DataGrid.Columns>
+		</DataGrid>
+	</Grid>
+</controls:MetroWindow>

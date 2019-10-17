@@ -7,6 +7,7 @@ namespace WpfGroupFinder.Logic
 		Action TimeoutAction { get; set; }
 
 		void StartTimer(int time);
+
 		void StopTimer();
 	}
 }

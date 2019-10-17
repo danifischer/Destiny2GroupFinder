@@ -1,6 +1,8 @@
 ﻿using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using WpfGroupFinder.Helper;
 using WpfGroupFinder.Models;
@@ -10,12 +12,20 @@ namespace WpfGroupFinder.ViewModels
 	public class GroupViewModel : ReactiveObject
 	{
 		internal Group _model;
+		private readonly FireteamViewModelFactory _fireteamViewModelFactory;
 
-		public GroupViewModel(Group group)
+		public GroupViewModel(Group group, FireteamViewModelFactory fireteamViewModelFactory)
 		{
 			_model = group;
+			_fireteamViewModelFactory = fireteamViewModelFactory;
 			OpenBungieCommand = new RelayCommand(_ => OpenGroup());
 			OpenRaidReportCommand = new RelayCommand(_ => OpenReport());
+			ShowDetailCommand = new RelayCommand(_ => ShowDetail());
+		}
+
+		private void ShowDetail()
+		{
+			_fireteamViewModelFactory.Create(this).Show();
 		}
 
 		public string FirstSeen => GetFirstSeenTime();
@@ -23,33 +33,20 @@ namespace WpfGroupFinder.ViewModels
 		public string Link => _model.Link;
 		public RelayCommand OpenBungieCommand { get; }
 		public RelayCommand OpenRaidReportCommand { get; }
-		public string Owner
+		public RelayCommand ShowDetailCommand { get; }
+
+		public Guardian Owner
 		{
-			get { return _model.Owner; }
-			internal set
-			{
-				_model.Owner = value;
-				this.RaisePropertyChanged();
-			}
+			get { return _model.Fireteam?.SingleOrDefault(i => i.IsLeader); }
 		}
 
-		public string OwnerId
+		public IEnumerable<Guardian> Fireteam
 		{
-			get { return _model.OwnerId; }
+			get { return _model.Fireteam; }
 			internal set
 			{
-				_model.OwnerId = value;
-				this.RaisePropertyChanged();
-			}
-		}
-
-		public string OwnerSteamId
-		{
-			get { return _model.OwnerSteamId; }
-			internal set
-			{
-				_model.OwnerSteamId = value;
-				this.RaisePropertyChanged();
+				_model.Fireteam = value;
+				this.RaisePropertyChanged(nameof(Owner));
 			}
 		}
 
@@ -93,6 +90,16 @@ namespace WpfGroupFinder.ViewModels
 			}
 		}
 
+		public bool Updated
+		{
+			get { return _model.Updated; }
+			internal set
+			{
+				_model.Updated = value;
+				this.RaisePropertyChanged();
+			}
+		}
+
 		public string Title => _model.Title;
 
 		public void OpenGroup()
@@ -117,8 +124,8 @@ namespace WpfGroupFinder.ViewModels
 
 		private void OpenReport()
 		{
-			if (OwnerId == "") return;
-			var user = WebUtility.UrlEncode(OwnerId);
+			if (Owner?.Id == "") return;
+			var user = WebUtility.UrlEncode(Owner.Id);
 			Process.Start($"https://raid.report/pc/{user}");
 		}
 	}

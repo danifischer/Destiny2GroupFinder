@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
 using WpfGroupFinder.Helper;
 using WpfGroupFinder.Models;
 
@@ -11,7 +9,7 @@ namespace WpfGroupFinder.Logic
 {
 	public class GroupParser : IGroupParser
 	{
-		public Tuple<string, string, string> GetOwnerInfo(string pageUrl)
+		public IEnumerable<Guardian> GetFireteam(string pageUrl)
 		{
 			var doc = new HtmlAgilityPack.HtmlDocument();
 			HtmlAgilityPack.HtmlNode.ElementsFlags["br"] = HtmlAgilityPack.HtmlElementFlag.Empty;
@@ -26,20 +24,27 @@ namespace WpfGroupFinder.Logic
 			}
 			catch
 			{
-				return new Tuple<string, string, string>("", null, null);
+				return null;
 			}
 
-			var item = doc.DocumentNode.SelectNodes("//li[contains(@class,'user-fireteam')]").First().ParentNode
-				.SelectSingleNode("//li[contains(@class,'leader')]");
-			var membershipId = item.GetAttributeValue("data-membershipid", "");
+			var items = doc.DocumentNode.SelectNodes("//li[contains(@class,'user-fireteam ')]");
+			var list = new List<Guardian>();
 
-			var nameNode = item.ChildNodes.Single(i => i.HasClass("user-data"))
-				.ChildNodes.Single(j => j.HasClass("user-container"));
-				
-			var name = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.HasClass("display-name")).InnerText);
-			var steamId = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.Name == "span").InnerText.Replace("ID: ", ""));
+			foreach (var user in items)
+			{
+				var isLeader = user.HasClass("leader");
+				var membershipId = user.GetAttributeValue("data-membershipid", "");
 
-			return new Tuple<string, string, string>(name, membershipId, steamId);
+				var nameNode = user.ChildNodes.Single(i => i.HasClass("user-data"))
+					.ChildNodes.Single(j => j.HasClass("user-container"));
+
+				var name = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.HasClass("display-name")).InnerText);
+				var steamId = FormatFromWeb.Format(nameNode.ChildNodes.Single(j => j.Name == "span").InnerText.Replace("ID: ", ""));
+
+				list.Add(new Guardian() { Id = membershipId, Name = name, SteamId = steamId, IsLeader = isLeader });
+			}
+
+			return list;
 		}
 
 		public IEnumerable<Group> UpdateGroupList(IList<Group> currentGroups, string language)
@@ -107,9 +112,6 @@ namespace WpfGroupFinder.Logic
 						Id = id,
 						FirstSeen = DateTime.Now,
 						Title = title,
-						Owner = "",//owner.Item1,
-						OwnerId = "",//owner.Item2,
-						OwnerSteamId = "",
 						Space = space.ToString(),
 						Time = time,
 						Link = url
@@ -132,10 +134,24 @@ namespace WpfGroupFinder.Logic
 			{
 				var group = currentGroups.Single(i => i.Id == item.Id);
 				group.Space = item.Space;
+
+				if (TimeSplicer(group.Time) > TimeSplicer(item.Time))
+				{
+					group.Updated = true;
+				}
+
 				group.Time = item.Time;
 			}
 
 			return currentGroups;
+		}
+
+		private static int TimeSplicer(string time)
+		{
+			if (time == "now") return 0;
+			if (time.Contains("h")) return 99;
+
+			return int.Parse(new string(time.Where(char.IsDigit).ToArray()));
 		}
 	}
 }

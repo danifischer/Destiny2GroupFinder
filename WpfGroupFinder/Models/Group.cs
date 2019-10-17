@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WpfGroupFinder.Models
 {
@@ -10,10 +11,9 @@ namespace WpfGroupFinder.Models
 		public string Link { get; set; }
 		public string Space { get; set; }
 		public string Time { get; set; }
-		public string Owner { get; set; }
-		public string OwnerId { get; set; }
-		public string OwnerSteamId { get; set; }
+		public IEnumerable<Guardian> Fireteam { get; set; }
 		public RaidType Type { get; set; }
 		public string Clears { get; set; }
+		public bool Updated { get; set; }
 	}
 }

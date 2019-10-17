@@ -1,9 +1,11 @@
 ﻿using Autofac;
 using ReactiveUI;
 using System;
+using WpfGroupFinder.Helper;
 using WpfGroupFinder.Logic;
 using WpfGroupFinder.Models;
 using WpfGroupFinder.ViewModels;
+using WpfGroupFinder.Views;
 
 namespace WpfGroupFinder
 {
@@ -19,6 +21,8 @@ namespace WpfGroupFinder
 			containerBuilder.RegisterType<FileHandler>().As<IFileHandler>();
 			containerBuilder.RegisterType<RaidCategorizer>().As<IRaidCategorizer>();
 			containerBuilder.RegisterType<MainWindow>();
+			containerBuilder.RegisterType<FireteamDetailView>();
+			containerBuilder.RegisterType<FireteamViewModelFactory>();
 			containerBuilder.RegisterType<MainViewModel>();
 
 			containerBuilder.RegisterInstance(new Languages("Deutsch", "de", "de"));

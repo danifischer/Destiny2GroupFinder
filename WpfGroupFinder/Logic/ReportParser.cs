@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using WpfGroupFinder.Models;
 
 namespace WpfGroupFinder.Logic
@@ -18,12 +15,12 @@ namespace WpfGroupFinder.Logic
 			_activities = fileHandler.LoadHashInformation().Where(i => i.Type == "Raid");
 		}
 
-		public string GetClears(string bungieId, string raidType)
+		public void SetClears(Guardian guardian, string raidType)
 		{
 			// Report AWS page
 			// https://b9bv2wd97h.execute-api.us-west-2.amazonaws.com/prod/api/player/4611686018472629478
 			// var pageUrl = $@"https://raid.report/pc/{bungieId}";
-			var pageUrl = $@"https://b9bv2wd97h.execute-api.us-west-2.amazonaws.com/prod/api/player/{bungieId}";
+			var pageUrl = $@"https://b9bv2wd97h.execute-api.us-west-2.amazonaws.com/prod/api/player/{guardian.Id}";
 
 			var doc = new HtmlAgilityPack.HtmlDocument();
 			HtmlAgilityPack.HtmlNode.ElementsFlags["br"] = HtmlAgilityPack.HtmlElementFlag.Empty;
@@ -39,7 +36,7 @@ namespace WpfGroupFinder.Logic
 				stream.Close();
 
 				var json = JObject.Parse(doc.DocumentNode.InnerHtml);
-				var totalClears = json["response"]["clearsRank"]["value"].ToString();
+				var totalClears = int.Parse(json["response"]["clearsRank"]["value"].ToString());
 
 				var activities = JArray.Parse(json["response"]["activities"].ToString());
 				var clears = 0;
@@ -52,12 +49,14 @@ namespace WpfGroupFinder.Logic
 					}
 				}
 
-				return clears + " (" + totalClears + ")";
+				guardian.ClearsActivity = clears;
+				guardian.ClearsTotal = totalClears;
 			}
 			catch
 			{
-				return "n/a";
-			}	
+				guardian.ClearsActivity = null;
+				guardian.ClearsTotal = null;
+			}
 		}
 	}
 }
