@@ -19,7 +19,7 @@ The displayed information consists of:
 - Time:  
   The time the program first saw this group
 - Clears:  
-  The number of clears the person has for this raid (including checkpoints) and the number of fullclears on all raids (in brackets)
+  The average number of clears the fireteam has for this raid (including checkpoints) and the number of fullclears on all raids (in brackets)
 - Bungie:  
   Link to the bungie group
 - Report:  
